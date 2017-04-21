@@ -732,9 +732,9 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-"box2dweb@git+https://github.com/Prozi/box2dweb.git#master":
+"box2dweb@git://github.com/Prozi/box2dweb.git#master":
   version "2.1.1"
-  resolved "git+https://github.com/Prozi/box2dweb.git#1de9df26048a67560a6d24ddfa939a88a10cc031"
+  resolved "git://github.com/Prozi/box2dweb.git#1de9df26048a67560a6d24ddfa939a88a10cc031"
 
 brace-expansion@^1.0.0:
   version "1.1.6"
