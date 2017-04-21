@@ -5084,13 +5084,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 let Box2D = {};
 
 (((a2j, undefined) => {
-  function emptyFn () {};
-  a2j.inherit = (cls, base) => {
-    const tmpCtr = cls
-    emptyFn.prototype = base.prototype
-    cls.prototype = new emptyFn()
-    cls.prototype.constructor = tmpCtr
-  }
 
   a2j.generateCallback = function generateCallback (context, cb) {
     return function () {
@@ -6731,8 +6724,55 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Collision.Features = Features
 
-  class b2CircleShape {
+  class b2Shape {
     constructor () {
+      b2Shape.b2Shape.apply(this, arguments)
+      if (this.constructor === b2Shape) this.b2Shape.apply(this, arguments)
+    }
+
+    Copy () {
+      return null
+    }
+
+    Set (other) {
+      this.m_radius = other.m_radius
+    }
+
+    GetType () {
+      return this.m_type
+    }
+
+    TestPoint (xf, p) {
+      return false
+    }
+
+    RayCast (output, input, transform) {
+      return false
+    }
+
+    ComputeAABB (aabb, xf) {}
+
+    ComputeMass (massData, density) {
+      if (density === undefined) density = 0
+    }
+
+    ComputeSubmergedArea (normal, offset, xf, c) {
+      if (offset === undefined) offset = 0
+      return 0
+    }
+
+    b2Shape () {
+      this.m_type = b2Shape.e_unknownShape
+      this.m_radius = b2Settings.b2_linearSlop
+    }
+   }
+
+  Box2D.Collision.Shapes.b2Shape = b2Shape
+  Box2D.Common.b2internal = 'Box2D.Common.b2internal'
+
+  class b2CircleShape extends b2Shape {
+    constructor () {
+      super(...arguments);
       b2CircleShape.b2CircleShape.apply(this, arguments)
       if (this.constructor === b2CircleShape) this.b2CircleShape.apply(this, arguments)
     }
@@ -6869,8 +6909,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Collision.Shapes.b2EdgeChainDef = b2EdgeChainDef
 
-  class b2EdgeShape {
+  class b2EdgeShape extends b2Shape {
     constructor () {
+      super(...arguments);
       b2EdgeShape.b2EdgeShape.apply(this, arguments)
       if (this.constructor === b2EdgeShape) this.b2EdgeShape.apply(this, arguments)
     }
@@ -7098,8 +7139,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Collision.Shapes.b2MassData = b2MassData
 
-  class b2PolygonShape {
+  class b2PolygonShape extends b2Shape {
     constructor () {
+      super(...arguments);
       b2PolygonShape.b2PolygonShape.apply(this, arguments)
       if (this.constructor === b2PolygonShape) this.b2PolygonShape.apply(this, arguments)
     }
@@ -7491,53 +7533,6 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
    }
 
   Box2D.Collision.Shapes.b2PolygonShape = b2PolygonShape
-
-  class b2Shape {
-    constructor () {
-      b2Shape.b2Shape.apply(this, arguments)
-      if (this.constructor === b2Shape) this.b2Shape.apply(this, arguments)
-    }
-
-    Copy () {
-      return null
-    }
-
-    Set (other) {
-      this.m_radius = other.m_radius
-    }
-
-    GetType () {
-      return this.m_type
-    }
-
-    TestPoint (xf, p) {
-      return false
-    }
-
-    RayCast (output, input, transform) {
-      return false
-    }
-
-    ComputeAABB (aabb, xf) {}
-
-    ComputeMass (massData, density) {
-      if (density === undefined) density = 0
-    }
-
-    ComputeSubmergedArea (normal, offset, xf, c) {
-      if (offset === undefined) offset = 0
-      return 0
-    }
-
-    b2Shape () {
-      this.m_type = b2Shape.e_unknownShape
-      this.m_radius = b2Settings.b2_linearSlop
-    }
-   }
-
-  Box2D.Collision.Shapes.b2Shape = b2Shape
-  Box2D.Common.b2internal = 'Box2D.Common.b2internal'
-
   class b2Color {
     constructor () {
       b2Color.b2Color.apply(this, arguments)
@@ -10684,28 +10679,6 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.b2World = b2World
 
-  class b2CircleContact {
-    constructor () {
-      b2CircleContact.b2CircleContact.apply(this, arguments)
-    }
-
-    static b2CircleContact () {
-      Box2D.Dynamics.Contacts.b2Contact.b2Contact.apply(this, arguments)
-    }
-
-    Reset (fixtureA, fixtureB) {
-      this.__super.Reset.call(this, fixtureA, fixtureB)
-    }
-
-    Evaluate () {
-      const bA = this.m_fixtureA.GetBody()
-      const bB = this.m_fixtureB.GetBody()
-      b2Collision.CollideCircles(this.m_manifold, (this.m_fixtureA.GetShape() instanceof b2CircleShape ? this.m_fixtureA.GetShape() : null), bA.m_xf, (this.m_fixtureB.GetShape() instanceof b2CircleShape ? this.m_fixtureB.GetShape() : null), bB.m_xf)
-    }
-   }
-
-  Box2D.Dynamics.Contacts.b2CircleContact = b2CircleContact
-
   class b2Contact {
     constructor () {
       b2Contact.b2Contact.apply(this, arguments)
@@ -10892,6 +10865,29 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
    }
 
   Box2D.Dynamics.Contacts.b2Contact = b2Contact
+
+  class b2CircleContact extends b2Contact {
+    constructor () {
+      super(...arguments);
+      b2CircleContact.b2CircleContact.apply(this, arguments)
+    }
+
+    static b2CircleContact () {
+      Box2D.Dynamics.Contacts.b2Contact.b2Contact.apply(this, arguments)
+    }
+
+    Reset (fixtureA, fixtureB) {
+      this.__super.Reset.call(this, fixtureA, fixtureB)
+    }
+
+    Evaluate () {
+      const bA = this.m_fixtureA.GetBody()
+      const bB = this.m_fixtureB.GetBody()
+      b2Collision.CollideCircles(this.m_manifold, (this.m_fixtureA.GetShape() instanceof b2CircleShape ? this.m_fixtureA.GetShape() : null), bA.m_xf, (this.m_fixtureB.GetShape() instanceof b2CircleShape ? this.m_fixtureB.GetShape() : null), bB.m_xf)
+    }
+   }
+
+  Box2D.Dynamics.Contacts.b2CircleContact = b2CircleContact
 
   class b2ContactConstraint {
     constructor () {
@@ -11458,8 +11454,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Contacts.b2ContactSolver = b2ContactSolver
 
-  class b2EdgeAndCircleContact {
+  class b2EdgeAndCircleContact extends b2Contact {
     constructor () {
+      super(...arguments);
       b2EdgeAndCircleContact.b2EdgeAndCircleContact.apply(this, arguments)
     }
 
@@ -11482,8 +11479,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Contacts.b2EdgeAndCircleContact = b2EdgeAndCircleContact
 
-  class b2NullContact {
+  class b2NullContact extends b2Contact {
     constructor () {
+      super(...arguments);
       b2NullContact.b2NullContact.apply(this, arguments)
       if (this.constructor === b2NullContact) this.b2NullContact.apply(this, arguments)
     }
@@ -11501,8 +11499,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Contacts.b2NullContact = b2NullContact
 
-  class b2PolyAndCircleContact {
+  class b2PolyAndCircleContact extends b2Contact {
     constructor () {
+      super(...arguments);
       b2PolyAndCircleContact.b2PolyAndCircleContact.apply(this, arguments)
     }
 
@@ -11525,8 +11524,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Contacts.b2PolyAndCircleContact = b2PolyAndCircleContact
 
-  class b2PolyAndEdgeContact {
+  class b2PolyAndEdgeContact extends b2Contact {
     constructor () {
+      super(...arguments);
       b2PolyAndEdgeContact.b2PolyAndEdgeContact.apply(this, arguments)
     }
 
@@ -11551,8 +11551,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Contacts.b2PolyAndEdgeContact = b2PolyAndEdgeContact
 
-  class b2PolygonContact {
+  class b2PolygonContact extends b2Contact {
     constructor () {
+      super(...arguments);
       b2PolygonContact.b2PolygonContact.apply(this, arguments)
     }
 
@@ -11675,8 +11676,65 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Contacts.b2PositionSolverManifold = b2PositionSolverManifold
 
-  class b2BuoyancyController {
+  class b2Controller {
     constructor () {
+      b2Controller.b2Controller.apply(this, arguments)
+    }
+
+    Step (step) {}
+    Draw (debugDraw) {}
+
+    AddBody (body) {
+      const edge = new b2ControllerEdge()
+      edge.controller = this
+      edge.body = body
+      edge.nextBody = this.m_bodyList
+      edge.prevBody = null
+      this.m_bodyList = edge
+      if (edge.nextBody) edge.nextBody.prevBody = edge
+      this.m_bodyCount++
+      edge.nextController = body.m_controllerList
+      edge.prevController = null
+      body.m_controllerList = edge
+      if (edge.nextController) edge.nextController.prevController = edge
+      body.m_controllerCount++
+    }
+
+    RemoveBody (body) {
+      let edge = body.m_controllerList
+      while (edge && edge.controller != this) { edge = edge.nextController }
+      if (edge.prevBody) edge.prevBody.nextBody = edge.nextBody
+      if (edge.nextBody) edge.nextBody.prevBody = edge.prevBody
+      if (edge.nextController) edge.nextController.prevController = edge.prevController
+      if (edge.prevController) edge.prevController.nextController = edge.nextController
+      if (this.m_bodyList == edge) this.m_bodyList = edge.nextBody
+      if (body.m_controllerList == edge) body.m_controllerList = edge.nextController
+      body.m_controllerCount--
+      this.m_bodyCount--
+    }
+
+    Clear () {
+      while (this.m_bodyList) { this.RemoveBody(this.m_bodyList.body) }
+    }
+
+    GetNext () {
+      return this.m_next
+    }
+
+    GetWorld () {
+      return this.m_world
+    }
+
+    GetBodyList () {
+      return this.m_bodyList
+    }
+   }
+
+  Box2D.Dynamics.Controllers.b2Controller = b2Controller
+
+  class b2BuoyancyController extends b2Controller {
+    constructor () {
+      super(...arguments);
       b2BuoyancyController.b2BuoyancyController.apply(this, arguments)
     }
 
@@ -11754,8 +11812,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Controllers.b2BuoyancyController = b2BuoyancyController
 
-  class b2ConstantAccelController {
+  class b2ConstantAccelController extends b2Controller {
     constructor () {
+      super(...arguments);
       b2ConstantAccelController.b2ConstantAccelController.apply(this, arguments)
     }
 
@@ -11776,8 +11835,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Controllers.b2ConstantAccelController = b2ConstantAccelController
 
-  class b2ConstantForceController {
+  class b2ConstantForceController extends b2Controller {
     constructor () {
+      super(...arguments);
       b2ConstantForceController.b2ConstantForceController.apply(this, arguments)
     }
 
@@ -11797,69 +11857,14 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Controllers.b2ConstantForceController = b2ConstantForceController
 
-  class b2Controller {
-    constructor () {
-      b2Controller.b2Controller.apply(this, arguments)
-    }
-
-    Step (step) {}
-    Draw (debugDraw) {}
-
-    AddBody (body) {
-      const edge = new b2ControllerEdge()
-      edge.controller = this
-      edge.body = body
-      edge.nextBody = this.m_bodyList
-      edge.prevBody = null
-      this.m_bodyList = edge
-      if (edge.nextBody) edge.nextBody.prevBody = edge
-      this.m_bodyCount++
-      edge.nextController = body.m_controllerList
-      edge.prevController = null
-      body.m_controllerList = edge
-      if (edge.nextController) edge.nextController.prevController = edge
-      body.m_controllerCount++
-    }
-
-    RemoveBody (body) {
-      let edge = body.m_controllerList
-      while (edge && edge.controller != this) { edge = edge.nextController }
-      if (edge.prevBody) edge.prevBody.nextBody = edge.nextBody
-      if (edge.nextBody) edge.nextBody.prevBody = edge.prevBody
-      if (edge.nextController) edge.nextController.prevController = edge.prevController
-      if (edge.prevController) edge.prevController.nextController = edge.nextController
-      if (this.m_bodyList == edge) this.m_bodyList = edge.nextBody
-      if (body.m_controllerList == edge) body.m_controllerList = edge.nextController
-      body.m_controllerCount--
-      this.m_bodyCount--
-    }
-
-    Clear () {
-      while (this.m_bodyList) { this.RemoveBody(this.m_bodyList.body) }
-    }
-
-    GetNext () {
-      return this.m_next
-    }
-
-    GetWorld () {
-      return this.m_world
-    }
-
-    GetBodyList () {
-      return this.m_bodyList
-    }
-   }
-
-  Box2D.Dynamics.Controllers.b2Controller = b2Controller
-
   function b2ControllerEdge () {
     b2ControllerEdge.b2ControllerEdge.apply(this, arguments)
   }
   Box2D.Dynamics.Controllers.b2ControllerEdge = b2ControllerEdge
 
-  class b2GravityController {
+  class b2GravityController extends b2Controller {
     constructor () {
+      super(...arguments);
       b2GravityController.b2GravityController.apply(this, arguments)
     }
 
@@ -11929,8 +11934,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Controllers.b2GravityController = b2GravityController
 
-  class b2TensorDampingController {
+  class b2TensorDampingController extends b2Controller {
     constructor () {
+      super(...arguments);
       b2TensorDampingController.b2TensorDampingController.apply(this, arguments)
     }
 
@@ -11971,30 +11977,34 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Controllers.b2TensorDampingController = b2TensorDampingController
 
-  class b2DistanceJoint {
+  class b2Joint {
     constructor () {
-      b2DistanceJoint.b2DistanceJoint.apply(this, arguments)
-      if (this.constructor === b2DistanceJoint) this.b2DistanceJoint.apply(this, arguments)
+      b2Joint.b2Joint.apply(this, arguments)
+      if (this.constructor === b2Joint) this.b2Joint.apply(this, arguments)
     }
 
-    static b2DistanceJoint () {
-      Box2D.Dynamics.Joints.b2Joint.b2Joint.apply(this, arguments)
-      this.m_localAnchor1 = new b2Vec2()
-      this.m_localAnchor2 = new b2Vec2()
-      this.m_u = new b2Vec2()
+    static b2Joint () {
+      this.m_edgeA = new b2JointEdge()
+      this.m_edgeB = new b2JointEdge()
+      this.m_localCenterA = new b2Vec2()
+      this.m_localCenterB = new b2Vec2()
+    }
+
+    GetType () {
+      return this.m_type
     }
 
     GetAnchorA () {
-      return this.m_bodyA.GetWorldPoint(this.m_localAnchor1)
+      return null
     }
 
     GetAnchorB () {
-      return this.m_bodyB.GetWorldPoint(this.m_localAnchor2)
+      return null
     }
 
     GetReactionForce (inv_dt) {
       if (inv_dt === undefined) inv_dt = 0
-      return new b2Vec2(inv_dt * this.m_impulse * this.m_u.x, inv_dt * this.m_impulse * this.m_u.y)
+      return null
     }
 
     GetReactionTorque (inv_dt) {
@@ -12002,183 +12012,74 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
       return 0.0
     }
 
-    GetLength () {
-      return this.m_length
+    GetBodyA () {
+      return this.m_bodyA
     }
 
-    SetLength (length) {
-      if (length === undefined) length = 0
-      this.m_length = length
+    GetBodyB () {
+      return this.m_bodyB
     }
 
-    GetFrequency () {
-      return this.m_frequencyHz
+    GetNext () {
+      return this.m_next
     }
 
-    SetFrequency (hz) {
-      if (hz === undefined) hz = 0
-      this.m_frequencyHz = hz
+    GetUserData () {
+      return this.m_userData
     }
 
-    GetDampingRatio () {
-      return this.m_dampingRatio
+    SetUserData (data) {
+      this.m_userData = data
     }
 
-    SetDampingRatio (ratio) {
-      if (ratio === undefined) ratio = 0
-      this.m_dampingRatio = ratio
+    IsActive () {
+      return this.m_bodyA.IsActive() && this.m_bodyB.IsActive()
     }
 
-    b2DistanceJoint (def) {
-      this.__super.b2Joint.call(this, def)
-      let tMat
-      const tX = 0
-      const tY = 0
-      this.m_localAnchor1.SetV(def.localAnchorA)
-      this.m_localAnchor2.SetV(def.localAnchorB)
-      this.m_length = def.length
-      this.m_frequencyHz = def.frequencyHz
-      this.m_dampingRatio = def.dampingRatio
-      this.m_impulse = 0.0
-      this.m_gamma = 0.0
-      this.m_bias = 0.0
+    b2Joint (def) {
+      b2Settings.b2Assert(def.bodyA != def.bodyB)
+      this.m_type = def.type
+      this.m_prev = null
+      this.m_next = null
+      this.m_bodyA = def.bodyA
+      this.m_bodyB = def.bodyB
+      this.m_collideConnected = def.collideConnected
+      this.m_islandFlag = false
+      this.m_userData = def.userData
     }
 
-    InitVelocityConstraints (step) {
-      let tMat
-      let tX = 0
-      const bA = this.m_bodyA
-      const bB = this.m_bodyB
-      tMat = bA.m_xf.R
-      let r1X = this.m_localAnchor1.x - bA.m_sweep.localCenter.x
-      let r1Y = this.m_localAnchor1.y - bA.m_sweep.localCenter.y
-      tX = (tMat.col1.x * r1X + tMat.col2.x * r1Y)
-      r1Y = (tMat.col1.y * r1X + tMat.col2.y * r1Y)
-      r1X = tX
-      tMat = bB.m_xf.R
-      let r2X = this.m_localAnchor2.x - bB.m_sweep.localCenter.x
-      let r2Y = this.m_localAnchor2.y - bB.m_sweep.localCenter.y
-      tX = (tMat.col1.x * r2X + tMat.col2.x * r2Y)
-      r2Y = (tMat.col1.y * r2X + tMat.col2.y * r2Y)
-      r2X = tX
-      this.m_u.x = bB.m_sweep.c.x + r2X - bA.m_sweep.c.x - r1X
-      this.m_u.y = bB.m_sweep.c.y + r2Y - bA.m_sweep.c.y - r1Y
-      const length = Math.sqrt(this.m_u.x * this.m_u.x + this.m_u.y * this.m_u.y)
-      if (length > b2Settings.b2_linearSlop) {
-        this.m_u.Multiply(1.0 / length)
-      } else {
-        this.m_u.SetZero()
-      }
-      const cr1u = (r1X * this.m_u.y - r1Y * this.m_u.x)
-      const cr2u = (r2X * this.m_u.y - r2Y * this.m_u.x)
-      const invMass = bA.m_invMass + bA.m_invI * cr1u * cr1u + bB.m_invMass + bB.m_invI * cr2u * cr2u
-      this.m_mass = invMass != 0.0 ? 1.0 / invMass : 0.0
-      if (this.m_frequencyHz > 0.0) {
-        const C = length - this.m_length
-        const omega = 2.0 * Math.PI * this.m_frequencyHz
-        const d = 2.0 * this.m_mass * this.m_dampingRatio * omega
-        const k = this.m_mass * omega * omega
-        this.m_gamma = step.dt * (d + step.dt * k)
-        this.m_gamma = this.m_gamma != 0.0 ? 1 / this.m_gamma : 0.0
-        this.m_bias = C * step.dt * k * this.m_gamma
-        this.m_mass = invMass + this.m_gamma
-        this.m_mass = this.m_mass != 0.0 ? 1.0 / this.m_mass : 0.0
-      }
-      if (step.warmStarting) {
-        this.m_impulse *= step.dtRatio
-        const PX = this.m_impulse * this.m_u.x
-        const PY = this.m_impulse * this.m_u.y
-        bA.m_linearVelocity.x -= bA.m_invMass * PX
-        bA.m_linearVelocity.y -= bA.m_invMass * PY
-        bA.m_angularVelocity -= bA.m_invI * (r1X * PY - r1Y * PX)
-        bB.m_linearVelocity.x += bB.m_invMass * PX
-        bB.m_linearVelocity.y += bB.m_invMass * PY
-        bB.m_angularVelocity += bB.m_invI * (r2X * PY - r2Y * PX)
-      } else {
-        this.m_impulse = 0.0
-      }
-    }
-
-    SolveVelocityConstraints (step) {
-      let tMat
-      const bA = this.m_bodyA
-      const bB = this.m_bodyB
-      tMat = bA.m_xf.R
-      let r1X = this.m_localAnchor1.x - bA.m_sweep.localCenter.x
-      let r1Y = this.m_localAnchor1.y - bA.m_sweep.localCenter.y
-      let tX = (tMat.col1.x * r1X + tMat.col2.x * r1Y)
-      r1Y = (tMat.col1.y * r1X + tMat.col2.y * r1Y)
-      r1X = tX
-      tMat = bB.m_xf.R
-      let r2X = this.m_localAnchor2.x - bB.m_sweep.localCenter.x
-      let r2Y = this.m_localAnchor2.y - bB.m_sweep.localCenter.y
-      tX = (tMat.col1.x * r2X + tMat.col2.x * r2Y)
-      r2Y = (tMat.col1.y * r2X + tMat.col2.y * r2Y)
-      r2X = tX
-      const v1X = bA.m_linearVelocity.x + ((-bA.m_angularVelocity * r1Y))
-      const v1Y = bA.m_linearVelocity.y + (bA.m_angularVelocity * r1X)
-      const v2X = bB.m_linearVelocity.x + ((-bB.m_angularVelocity * r2Y))
-      const v2Y = bB.m_linearVelocity.y + (bB.m_angularVelocity * r2X)
-      const Cdot = (this.m_u.x * (v2X - v1X) + this.m_u.y * (v2Y - v1Y))
-      const impulse = (-this.m_mass * (Cdot + this.m_bias + this.m_gamma * this.m_impulse))
-      this.m_impulse += impulse
-      const PX = impulse * this.m_u.x
-      const PY = impulse * this.m_u.y
-      bA.m_linearVelocity.x -= bA.m_invMass * PX
-      bA.m_linearVelocity.y -= bA.m_invMass * PY
-      bA.m_angularVelocity -= bA.m_invI * (r1X * PY - r1Y * PX)
-      bB.m_linearVelocity.x += bB.m_invMass * PX
-      bB.m_linearVelocity.y += bB.m_invMass * PY
-      bB.m_angularVelocity += bB.m_invI * (r2X * PY - r2Y * PX)
-    }
+    InitVelocityConstraints (step) {}
+    SolveVelocityConstraints (step) {}
+    FinalizeVelocityConstraints () {}
 
     SolvePositionConstraints (baumgarte) {
       if (baumgarte === undefined) baumgarte = 0
-      let tMat
-      if (this.m_frequencyHz > 0.0) {
-        return true
-      }
-      const bA = this.m_bodyA
-      const bB = this.m_bodyB
-      tMat = bA.m_xf.R
-      let r1X = this.m_localAnchor1.x - bA.m_sweep.localCenter.x
-      let r1Y = this.m_localAnchor1.y - bA.m_sweep.localCenter.y
-      let tX = (tMat.col1.x * r1X + tMat.col2.x * r1Y)
-      r1Y = (tMat.col1.y * r1X + tMat.col2.y * r1Y)
-      r1X = tX
-      tMat = bB.m_xf.R
-      let r2X = this.m_localAnchor2.x - bB.m_sweep.localCenter.x
-      let r2Y = this.m_localAnchor2.y - bB.m_sweep.localCenter.y
-      tX = (tMat.col1.x * r2X + tMat.col2.x * r2Y)
-      r2Y = (tMat.col1.y * r2X + tMat.col2.y * r2Y)
-      r2X = tX
-      let dX = bB.m_sweep.c.x + r2X - bA.m_sweep.c.x - r1X
-      let dY = bB.m_sweep.c.y + r2Y - bA.m_sweep.c.y - r1Y
-      const length = Math.sqrt(dX * dX + dY * dY)
-      dX /= length
-      dY /= length
-      let C = length - this.m_length
-      C = b2Math.Clamp(C, (-b2Settings.b2_maxLinearCorrection), b2Settings.b2_maxLinearCorrection)
-      const impulse = (-this.m_mass * C)
-      this.m_u.Set(dX, dY)
-      const PX = impulse * this.m_u.x
-      const PY = impulse * this.m_u.y
-      bA.m_sweep.c.x -= bA.m_invMass * PX
-      bA.m_sweep.c.y -= bA.m_invMass * PY
-      bA.m_sweep.a -= bA.m_invI * (r1X * PY - r1Y * PX)
-      bB.m_sweep.c.x += bB.m_invMass * PX
-      bB.m_sweep.c.y += bB.m_invMass * PY
-      bB.m_sweep.a += bB.m_invI * (r2X * PY - r2Y * PX)
-      bA.SynchronizeTransform()
-      bB.SynchronizeTransform()
-      return b2Math.Abs(C) < b2Settings.b2_linearSlop
+      return false
     }
    }
 
-  Box2D.Dynamics.Joints.b2DistanceJoint = b2DistanceJoint
+  Box2D.Dynamics.Joints.b2Joint = b2Joint
 
-  class b2DistanceJointDef {
+  class b2JointDef {
     constructor () {
+      b2JointDef.b2JointDef.apply(this, arguments)
+      if (this.constructor === b2JointDef) this.b2JointDef.apply(this, arguments)
+    }
+
+    b2JointDef () {
+      this.type = b2Joint.e_unknownJoint
+      this.userData = null
+      this.bodyA = null
+      this.bodyB = null
+      this.collideConnected = false
+    }
+  }
+
+  Box2D.Dynamics.Joints.b2JointDef = b2JointDef
+
+  class b2DistanceJointDef extends b2JointDef {
+    constructor () {
+      super(...arguments);
       b2DistanceJointDef.b2DistanceJointDef.apply(this, arguments)
       if (this.constructor === b2DistanceJointDef) this.b2DistanceJointDef.apply(this, arguments)
     }
@@ -12212,8 +12113,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2DistanceJointDef = b2DistanceJointDef
 
-  class b2FrictionJoint {
+  class b2FrictionJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2FrictionJoint.b2FrictionJoint.apply(this, arguments)
       if (this.constructor === b2FrictionJoint) this.b2FrictionJoint.apply(this, arguments)
     }
@@ -12395,8 +12297,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2FrictionJoint = b2FrictionJoint
 
-  class b2FrictionJointDef {
+  class b2FrictionJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2FrictionJointDef.b2FrictionJointDef.apply(this, arguments)
       if (this.constructor === b2FrictionJointDef) this.b2FrictionJointDef.apply(this, arguments)
     }
@@ -12424,8 +12327,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2FrictionJointDef = b2FrictionJointDef
 
-  class b2GearJoint {
+  class b2GearJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2GearJoint.b2GearJoint.apply(this, arguments)
       if (this.constructor === b2GearJoint) this.b2GearJoint.apply(this, arguments)
     }
@@ -12628,8 +12532,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2GearJoint = b2GearJoint
 
-  class b2GearJointDef {
+  class b2GearJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2GearJointDef.b2GearJointDef.apply(this, arguments)
       if (this.constructor === b2GearJointDef) this.b2GearJointDef.apply(this, arguments)
     }
@@ -12684,34 +12589,31 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2Jacobian = b2Jacobian
 
-  class b2Joint {
+  class b2DistanceJoint extends b2Joint {
     constructor () {
-      b2Joint.b2Joint.apply(this, arguments)
-      if (this.constructor === b2Joint) this.b2Joint.apply(this, arguments)
+      super(...arguments);
+      b2DistanceJoint.b2DistanceJoint.apply(this, arguments)
+      if (this.constructor === b2DistanceJoint) this.b2DistanceJoint.apply(this, arguments)
     }
 
-    static b2Joint () {
-      this.m_edgeA = new b2JointEdge()
-      this.m_edgeB = new b2JointEdge()
-      this.m_localCenterA = new b2Vec2()
-      this.m_localCenterB = new b2Vec2()
-    }
-
-    GetType () {
-      return this.m_type
+    static b2DistanceJoint () {
+      Box2D.Dynamics.Joints.b2Joint.b2Joint.apply(this, arguments)
+      this.m_localAnchor1 = new b2Vec2()
+      this.m_localAnchor2 = new b2Vec2()
+      this.m_u = new b2Vec2()
     }
 
     GetAnchorA () {
-      return null
+      return this.m_bodyA.GetWorldPoint(this.m_localAnchor1)
     }
 
     GetAnchorB () {
-      return null
+      return this.m_bodyB.GetWorldPoint(this.m_localAnchor2)
     }
 
     GetReactionForce (inv_dt) {
       if (inv_dt === undefined) inv_dt = 0
-      return null
+      return new b2Vec2(inv_dt * this.m_impulse * this.m_u.x, inv_dt * this.m_impulse * this.m_u.y)
     }
 
     GetReactionTorque (inv_dt) {
@@ -12719,78 +12621,189 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
       return 0.0
     }
 
-    GetBodyA () {
-      return this.m_bodyA
+    GetLength () {
+      return this.m_length
     }
 
-    GetBodyB () {
-      return this.m_bodyB
+    SetLength (length) {
+      if (length === undefined) length = 0
+      this.m_length = length
     }
 
-    GetNext () {
-      return this.m_next
+    GetFrequency () {
+      return this.m_frequencyHz
     }
 
-    GetUserData () {
-      return this.m_userData
+    SetFrequency (hz) {
+      if (hz === undefined) hz = 0
+      this.m_frequencyHz = hz
     }
 
-    SetUserData (data) {
-      this.m_userData = data
+    GetDampingRatio () {
+      return this.m_dampingRatio
     }
 
-    IsActive () {
-      return this.m_bodyA.IsActive() && this.m_bodyB.IsActive()
+    SetDampingRatio (ratio) {
+      if (ratio === undefined) ratio = 0
+      this.m_dampingRatio = ratio
     }
 
-    b2Joint (def) {
-      b2Settings.b2Assert(def.bodyA != def.bodyB)
-      this.m_type = def.type
-      this.m_prev = null
-      this.m_next = null
-      this.m_bodyA = def.bodyA
-      this.m_bodyB = def.bodyB
-      this.m_collideConnected = def.collideConnected
-      this.m_islandFlag = false
-      this.m_userData = def.userData
+    b2DistanceJoint (def) {
+      this.__super.b2Joint.call(this, def)
+      let tMat
+      const tX = 0
+      const tY = 0
+      this.m_localAnchor1.SetV(def.localAnchorA)
+      this.m_localAnchor2.SetV(def.localAnchorB)
+      this.m_length = def.length
+      this.m_frequencyHz = def.frequencyHz
+      this.m_dampingRatio = def.dampingRatio
+      this.m_impulse = 0.0
+      this.m_gamma = 0.0
+      this.m_bias = 0.0
     }
 
-    InitVelocityConstraints (step) {}
-    SolveVelocityConstraints (step) {}
-    FinalizeVelocityConstraints () {}
+    InitVelocityConstraints (step) {
+      let tMat
+      let tX = 0
+      const bA = this.m_bodyA
+      const bB = this.m_bodyB
+      tMat = bA.m_xf.R
+      let r1X = this.m_localAnchor1.x - bA.m_sweep.localCenter.x
+      let r1Y = this.m_localAnchor1.y - bA.m_sweep.localCenter.y
+      tX = (tMat.col1.x * r1X + tMat.col2.x * r1Y)
+      r1Y = (tMat.col1.y * r1X + tMat.col2.y * r1Y)
+      r1X = tX
+      tMat = bB.m_xf.R
+      let r2X = this.m_localAnchor2.x - bB.m_sweep.localCenter.x
+      let r2Y = this.m_localAnchor2.y - bB.m_sweep.localCenter.y
+      tX = (tMat.col1.x * r2X + tMat.col2.x * r2Y)
+      r2Y = (tMat.col1.y * r2X + tMat.col2.y * r2Y)
+      r2X = tX
+      this.m_u.x = bB.m_sweep.c.x + r2X - bA.m_sweep.c.x - r1X
+      this.m_u.y = bB.m_sweep.c.y + r2Y - bA.m_sweep.c.y - r1Y
+      const length = Math.sqrt(this.m_u.x * this.m_u.x + this.m_u.y * this.m_u.y)
+      if (length > b2Settings.b2_linearSlop) {
+        this.m_u.Multiply(1.0 / length)
+      } else {
+        this.m_u.SetZero()
+      }
+      const cr1u = (r1X * this.m_u.y - r1Y * this.m_u.x)
+      const cr2u = (r2X * this.m_u.y - r2Y * this.m_u.x)
+      const invMass = bA.m_invMass + bA.m_invI * cr1u * cr1u + bB.m_invMass + bB.m_invI * cr2u * cr2u
+      this.m_mass = invMass != 0.0 ? 1.0 / invMass : 0.0
+      if (this.m_frequencyHz > 0.0) {
+        const C = length - this.m_length
+        const omega = 2.0 * Math.PI * this.m_frequencyHz
+        const d = 2.0 * this.m_mass * this.m_dampingRatio * omega
+        const k = this.m_mass * omega * omega
+        this.m_gamma = step.dt * (d + step.dt * k)
+        this.m_gamma = this.m_gamma != 0.0 ? 1 / this.m_gamma : 0.0
+        this.m_bias = C * step.dt * k * this.m_gamma
+        this.m_mass = invMass + this.m_gamma
+        this.m_mass = this.m_mass != 0.0 ? 1.0 / this.m_mass : 0.0
+      }
+      if (step.warmStarting) {
+        this.m_impulse *= step.dtRatio
+        const PX = this.m_impulse * this.m_u.x
+        const PY = this.m_impulse * this.m_u.y
+        bA.m_linearVelocity.x -= bA.m_invMass * PX
+        bA.m_linearVelocity.y -= bA.m_invMass * PY
+        bA.m_angularVelocity -= bA.m_invI * (r1X * PY - r1Y * PX)
+        bB.m_linearVelocity.x += bB.m_invMass * PX
+        bB.m_linearVelocity.y += bB.m_invMass * PY
+        bB.m_angularVelocity += bB.m_invI * (r2X * PY - r2Y * PX)
+      } else {
+        this.m_impulse = 0.0
+      }
+    }
+
+    SolveVelocityConstraints (step) {
+      let tMat
+      const bA = this.m_bodyA
+      const bB = this.m_bodyB
+      tMat = bA.m_xf.R
+      let r1X = this.m_localAnchor1.x - bA.m_sweep.localCenter.x
+      let r1Y = this.m_localAnchor1.y - bA.m_sweep.localCenter.y
+      let tX = (tMat.col1.x * r1X + tMat.col2.x * r1Y)
+      r1Y = (tMat.col1.y * r1X + tMat.col2.y * r1Y)
+      r1X = tX
+      tMat = bB.m_xf.R
+      let r2X = this.m_localAnchor2.x - bB.m_sweep.localCenter.x
+      let r2Y = this.m_localAnchor2.y - bB.m_sweep.localCenter.y
+      tX = (tMat.col1.x * r2X + tMat.col2.x * r2Y)
+      r2Y = (tMat.col1.y * r2X + tMat.col2.y * r2Y)
+      r2X = tX
+      const v1X = bA.m_linearVelocity.x + ((-bA.m_angularVelocity * r1Y))
+      const v1Y = bA.m_linearVelocity.y + (bA.m_angularVelocity * r1X)
+      const v2X = bB.m_linearVelocity.x + ((-bB.m_angularVelocity * r2Y))
+      const v2Y = bB.m_linearVelocity.y + (bB.m_angularVelocity * r2X)
+      const Cdot = (this.m_u.x * (v2X - v1X) + this.m_u.y * (v2Y - v1Y))
+      const impulse = (-this.m_mass * (Cdot + this.m_bias + this.m_gamma * this.m_impulse))
+      this.m_impulse += impulse
+      const PX = impulse * this.m_u.x
+      const PY = impulse * this.m_u.y
+      bA.m_linearVelocity.x -= bA.m_invMass * PX
+      bA.m_linearVelocity.y -= bA.m_invMass * PY
+      bA.m_angularVelocity -= bA.m_invI * (r1X * PY - r1Y * PX)
+      bB.m_linearVelocity.x += bB.m_invMass * PX
+      bB.m_linearVelocity.y += bB.m_invMass * PY
+      bB.m_angularVelocity += bB.m_invI * (r2X * PY - r2Y * PX)
+    }
 
     SolvePositionConstraints (baumgarte) {
       if (baumgarte === undefined) baumgarte = 0
-      return false
+      let tMat
+      if (this.m_frequencyHz > 0.0) {
+        return true
+      }
+      const bA = this.m_bodyA
+      const bB = this.m_bodyB
+      tMat = bA.m_xf.R
+      let r1X = this.m_localAnchor1.x - bA.m_sweep.localCenter.x
+      let r1Y = this.m_localAnchor1.y - bA.m_sweep.localCenter.y
+      let tX = (tMat.col1.x * r1X + tMat.col2.x * r1Y)
+      r1Y = (tMat.col1.y * r1X + tMat.col2.y * r1Y)
+      r1X = tX
+      tMat = bB.m_xf.R
+      let r2X = this.m_localAnchor2.x - bB.m_sweep.localCenter.x
+      let r2Y = this.m_localAnchor2.y - bB.m_sweep.localCenter.y
+      tX = (tMat.col1.x * r2X + tMat.col2.x * r2Y)
+      r2Y = (tMat.col1.y * r2X + tMat.col2.y * r2Y)
+      r2X = tX
+      let dX = bB.m_sweep.c.x + r2X - bA.m_sweep.c.x - r1X
+      let dY = bB.m_sweep.c.y + r2Y - bA.m_sweep.c.y - r1Y
+      const length = Math.sqrt(dX * dX + dY * dY)
+      dX /= length
+      dY /= length
+      let C = length - this.m_length
+      C = b2Math.Clamp(C, (-b2Settings.b2_maxLinearCorrection), b2Settings.b2_maxLinearCorrection)
+      const impulse = (-this.m_mass * C)
+      this.m_u.Set(dX, dY)
+      const PX = impulse * this.m_u.x
+      const PY = impulse * this.m_u.y
+      bA.m_sweep.c.x -= bA.m_invMass * PX
+      bA.m_sweep.c.y -= bA.m_invMass * PY
+      bA.m_sweep.a -= bA.m_invI * (r1X * PY - r1Y * PX)
+      bB.m_sweep.c.x += bB.m_invMass * PX
+      bB.m_sweep.c.y += bB.m_invMass * PY
+      bB.m_sweep.a += bB.m_invI * (r2X * PY - r2Y * PX)
+      bA.SynchronizeTransform()
+      bB.SynchronizeTransform()
+      return b2Math.Abs(C) < b2Settings.b2_linearSlop
     }
-   }
+  }
 
-  Box2D.Dynamics.Joints.b2Joint = b2Joint
-
-  class b2JointDef {
-    constructor () {
-      b2JointDef.b2JointDef.apply(this, arguments)
-      if (this.constructor === b2JointDef) this.b2JointDef.apply(this, arguments)
-    }
-
-    b2JointDef () {
-      this.type = b2Joint.e_unknownJoint
-      this.userData = null
-      this.bodyA = null
-      this.bodyB = null
-      this.collideConnected = false
-    }
-   }
-
-  Box2D.Dynamics.Joints.b2JointDef = b2JointDef
+  Box2D.Dynamics.Joints.b2DistanceJoint = b2DistanceJoint
 
   function b2JointEdge () {
     b2JointEdge.b2JointEdge.apply(this, arguments)
   }
   Box2D.Dynamics.Joints.b2JointEdge = b2JointEdge
 
-  class b2LineJoint {
+  class b2LineJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2LineJoint.b2LineJoint.apply(this, arguments)
       if (this.constructor === b2LineJoint) this.b2LineJoint.apply(this, arguments)
     }
@@ -13237,8 +13250,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2LineJoint = b2LineJoint
 
-  class b2LineJointDef {
+  class b2LineJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2LineJointDef.b2LineJointDef.apply(this, arguments)
       if (this.constructor === b2LineJointDef) this.b2LineJointDef.apply(this, arguments)
     }
@@ -13273,8 +13287,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2LineJointDef = b2LineJointDef
 
-  class b2MouseJoint {
+  class b2MouseJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2MouseJoint.b2MouseJoint.apply(this, arguments)
       if (this.constructor === b2MouseJoint) this.b2MouseJoint.apply(this, arguments)
     }
@@ -13442,8 +13457,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2MouseJoint = b2MouseJoint
 
-  class b2MouseJointDef {
+  class b2MouseJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2MouseJointDef.b2MouseJointDef.apply(this, arguments)
       if (this.constructor === b2MouseJointDef) this.b2MouseJointDef.apply(this, arguments)
     }
@@ -13464,8 +13480,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2MouseJointDef = b2MouseJointDef
 
-  class b2PrismaticJoint {
+  class b2PrismaticJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2PrismaticJoint.b2PrismaticJoint.apply(this, arguments)
       if (this.constructor === b2PrismaticJoint) this.b2PrismaticJoint.apply(this, arguments)
     }
@@ -13917,8 +13934,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2PrismaticJoint = b2PrismaticJoint
 
-  class b2PrismaticJointDef {
+  class b2PrismaticJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2PrismaticJointDef.b2PrismaticJointDef.apply(this, arguments)
       if (this.constructor === b2PrismaticJointDef) this.b2PrismaticJointDef.apply(this, arguments)
     }
@@ -13955,8 +13973,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2PrismaticJointDef = b2PrismaticJointDef
 
-  class b2PulleyJoint {
+  class b2PulleyJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2PulleyJoint.b2PulleyJoint.apply(this, arguments)
       if (this.constructor === b2PulleyJoint) this.b2PulleyJoint.apply(this, arguments)
     }
@@ -14343,8 +14362,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2PulleyJoint = b2PulleyJoint
 
-  class b2PulleyJointDef {
+  class b2PulleyJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2PulleyJointDef.b2PulleyJointDef.apply(this, arguments)
       if (this.constructor === b2PulleyJointDef) this.b2PulleyJointDef.apply(this, arguments)
     }
@@ -14395,8 +14415,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2PulleyJointDef = b2PulleyJointDef
 
-  class b2RevoluteJoint {
+  class b2RevoluteJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2RevoluteJoint.b2RevoluteJoint.apply(this, arguments)
       if (this.constructor === b2RevoluteJoint) this.b2RevoluteJoint.apply(this, arguments)
     }
@@ -14797,8 +14818,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2RevoluteJoint = b2RevoluteJoint
 
-  class b2RevoluteJointDef {
+  class b2RevoluteJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2RevoluteJointDef.b2RevoluteJointDef.apply(this, arguments)
       if (this.constructor === b2RevoluteJointDef) this.b2RevoluteJointDef.apply(this, arguments)
     }
@@ -14834,8 +14856,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2RevoluteJointDef = b2RevoluteJointDef
 
-  class b2WeldJoint {
+  class b2WeldJoint extends b2Joint {
     constructor () {
+      super(...arguments);
       b2WeldJoint.b2WeldJoint.apply(this, arguments)
       if (this.constructor === b2WeldJoint) this.b2WeldJoint.apply(this, arguments)
     }
@@ -15018,8 +15041,9 @@ if (typeof (Box2D.Dynamics.Joints) === 'undefined') Box2D.Dynamics.Joints = {};
 
   Box2D.Dynamics.Joints.b2WeldJoint = b2WeldJoint
 
-  class b2WeldJointDef {
+  class b2WeldJointDef extends b2JointDef {
     constructor () {
+      super(...arguments);
       b2WeldJointDef.b2WeldJointDef.apply(this, arguments)
       if (this.constructor === b2WeldJointDef) this.b2WeldJointDef.apply(this, arguments)
     }
@@ -15832,12 +15856,9 @@ Box2D.postDefs = [];
   const Features = Box2D.Collision.Features
   const IBroadPhase = Box2D.Collision.IBroadPhase
 
-  Box2D.inherit(b2CircleShape, Box2D.Collision.Shapes.b2Shape)
   b2CircleShape.prototype.__super = Box2D.Collision.Shapes.b2Shape.prototype
   b2EdgeChainDef.b2EdgeChainDef = () => {}
-  Box2D.inherit(b2EdgeShape, Box2D.Collision.Shapes.b2Shape)
   b2EdgeShape.prototype.__super = Box2D.Collision.Shapes.b2Shape.prototype
-  Box2D.inherit(b2PolygonShape, Box2D.Collision.Shapes.b2Shape)
   b2PolygonShape.prototype.__super = Box2D.Collision.Shapes.b2Shape.prototype
   b2PolygonShape.AsArray = (vertices, vertexCount) => {
     if (vertexCount === undefined) vertexCount = 0
@@ -16435,7 +16456,6 @@ Box2D.postDefs = [];
   const Features = Box2D.Collision.Features
   const IBroadPhase = Box2D.Collision.IBroadPhase
 
-  Box2D.inherit(b2CircleContact, Box2D.Dynamics.Contacts.b2Contact)
   b2CircleContact.prototype.__super = Box2D.Dynamics.Contacts.b2Contact.prototype
   b2CircleContact.Create = allocator => new b2CircleContact()
   b2CircleContact.Destroy = (contact, allocator) => {}
@@ -16456,21 +16476,16 @@ Box2D.postDefs = [];
     Box2D.Dynamics.Contacts.b2ContactSolver.s_worldManifold = new b2WorldManifold()
     Box2D.Dynamics.Contacts.b2ContactSolver.s_psm = new b2PositionSolverManifold()
   })
-  Box2D.inherit(b2EdgeAndCircleContact, Box2D.Dynamics.Contacts.b2Contact)
   b2EdgeAndCircleContact.prototype.__super = Box2D.Dynamics.Contacts.b2Contact.prototype
   b2EdgeAndCircleContact.Create = allocator => new b2EdgeAndCircleContact()
   b2EdgeAndCircleContact.Destroy = (contact, allocator) => {}
-  Box2D.inherit(b2NullContact, Box2D.Dynamics.Contacts.b2Contact)
   b2NullContact.prototype.__super = Box2D.Dynamics.Contacts.b2Contact.prototype
-  Box2D.inherit(b2PolyAndCircleContact, Box2D.Dynamics.Contacts.b2Contact)
   b2PolyAndCircleContact.prototype.__super = Box2D.Dynamics.Contacts.b2Contact.prototype
   b2PolyAndCircleContact.Create = allocator => new b2PolyAndCircleContact()
   b2PolyAndCircleContact.Destroy = (contact, allocator) => {}
-  Box2D.inherit(b2PolyAndEdgeContact, Box2D.Dynamics.Contacts.b2Contact)
   b2PolyAndEdgeContact.prototype.__super = Box2D.Dynamics.Contacts.b2Contact.prototype
   b2PolyAndEdgeContact.Create = allocator => new b2PolyAndEdgeContact()
   b2PolyAndEdgeContact.Destroy = (contact, allocator) => {}
-  Box2D.inherit(b2PolygonContact, Box2D.Dynamics.Contacts.b2Contact)
   b2PolygonContact.prototype.__super = Box2D.Dynamics.Contacts.b2Contact.prototype
   b2PolygonContact.Create = allocator => new b2PolygonContact()
   b2PolygonContact.Destroy = (contact, allocator) => {}
@@ -16519,17 +16534,12 @@ Box2D.postDefs = [];
   const b2GravityController = Box2D.Dynamics.Controllers.b2GravityController
   const b2TensorDampingController = Box2D.Dynamics.Controllers.b2TensorDampingController
 
-  Box2D.inherit(b2BuoyancyController, Box2D.Dynamics.Controllers.b2Controller)
   b2BuoyancyController.prototype.__super = Box2D.Dynamics.Controllers.b2Controller.prototype
-  Box2D.inherit(b2ConstantAccelController, Box2D.Dynamics.Controllers.b2Controller)
   b2ConstantAccelController.prototype.__super = Box2D.Dynamics.Controllers.b2Controller.prototype
-  Box2D.inherit(b2ConstantForceController, Box2D.Dynamics.Controllers.b2Controller)
   b2ConstantForceController.prototype.__super = Box2D.Dynamics.Controllers.b2Controller.prototype
   b2Controller.b2Controller = () => {}
   b2ControllerEdge.b2ControllerEdge = () => {}
-  Box2D.inherit(b2GravityController, Box2D.Dynamics.Controllers.b2Controller)
   b2GravityController.prototype.__super = Box2D.Dynamics.Controllers.b2Controller.prototype
-  Box2D.inherit(b2TensorDampingController, Box2D.Dynamics.Controllers.b2Controller)
   b2TensorDampingController.prototype.__super = Box2D.Dynamics.Controllers.b2Controller.prototype
 }))();
 ((() => {
@@ -16580,17 +16590,11 @@ Box2D.postDefs = [];
   const b2TimeStep = Box2D.Dynamics.b2TimeStep
   const b2World = Box2D.Dynamics.b2World
 
-  Box2D.inherit(b2DistanceJoint, Box2D.Dynamics.Joints.b2Joint)
   b2DistanceJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
-  Box2D.inherit(b2DistanceJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2DistanceJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
-  Box2D.inherit(b2FrictionJoint, Box2D.Dynamics.Joints.b2Joint)
   b2FrictionJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
-  Box2D.inherit(b2FrictionJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2FrictionJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
-  Box2D.inherit(b2GearJoint, Box2D.Dynamics.Joints.b2Joint)
   b2GearJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
-  Box2D.inherit(b2GearJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2GearJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
   b2Joint.Create = (def, allocator) => {
     let joint = null
@@ -16664,35 +16668,23 @@ Box2D.postDefs = [];
   })
   b2JointDef.b2JointDef = () => {}
   b2JointEdge.b2JointEdge = () => {}
-  Box2D.inherit(b2LineJoint, Box2D.Dynamics.Joints.b2Joint)
   b2LineJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
-  Box2D.inherit(b2LineJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2LineJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
-  Box2D.inherit(b2MouseJoint, Box2D.Dynamics.Joints.b2Joint)
   b2MouseJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
-  Box2D.inherit(b2MouseJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2MouseJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
-  Box2D.inherit(b2PrismaticJoint, Box2D.Dynamics.Joints.b2Joint)
   b2PrismaticJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
-  Box2D.inherit(b2PrismaticJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2PrismaticJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
-  Box2D.inherit(b2PulleyJoint, Box2D.Dynamics.Joints.b2Joint)
   b2PulleyJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
   Box2D.postDefs.push(() => {
     Box2D.Dynamics.Joints.b2PulleyJoint.b2_minPulleyLength = 2.0
   })
-  Box2D.inherit(b2PulleyJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2PulleyJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
-  Box2D.inherit(b2RevoluteJoint, Box2D.Dynamics.Joints.b2Joint)
   b2RevoluteJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
   Box2D.postDefs.push(() => {
     Box2D.Dynamics.Joints.b2RevoluteJoint.tImpulse = new b2Vec2()
   })
-  Box2D.inherit(b2RevoluteJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2RevoluteJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
-  Box2D.inherit(b2WeldJoint, Box2D.Dynamics.Joints.b2Joint)
   b2WeldJoint.prototype.__super = Box2D.Dynamics.Joints.b2Joint.prototype
-  Box2D.inherit(b2WeldJointDef, Box2D.Dynamics.Joints.b2JointDef)
   b2WeldJointDef.prototype.__super = Box2D.Dynamics.Joints.b2JointDef.prototype
 }))();
 ((() => {

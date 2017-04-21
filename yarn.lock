@@ -732,9 +732,9 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-box2d-es6@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/box2d-es6/-/box2d-es6-1.0.0.tgz#b418acf54087fb3bb77b5a712fff43c85c9333d9"
+box2d-es6@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/box2d-es6/-/box2d-es6-1.0.1.tgz#fd6a68df73d7bd67a79c0774005a18bb0e2825cb"
 
 brace-expansion@^1.0.0:
   version "1.1.6"
