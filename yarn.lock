@@ -732,11 +732,7 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-box2dweb@^2.1.0-b:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/box2dweb/-/box2dweb-2.1.0.tgz#91d515ede9275121ad46b3a1da8851dba5111d7b"
-
-"box2dweb@git+https://github.com/Prozi/box2dweb.git":
+"box2dweb@git+https://github.com/Prozi/box2dweb.git#master":
   version "2.1.1"
   resolved "git+https://github.com/Prozi/box2dweb.git#1de9df26048a67560a6d24ddfa939a88a10cc031"
 
