@@ -4,7 +4,7 @@
 // http://buildnewgames.com/box2dweb/
 // wrapped up by me Jacek Pietal <prozi85@gmail.com>
 
-const Box2D = require('box2dweb');
+const Box2D = require('box2d-es6');
 
 // box2d
 const b2Vec2 = Box2D.Common.Math.b2Vec2;
