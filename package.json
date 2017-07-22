@@ -1,6 +1,6 @@
 {
   "name": "gameframework",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "[unmaintained in favor of gameframework-lite]",
   "main": "es2015/index.js",
   "scripts": {
