@@ -1,7 +1,7 @@
 {
   "name": "gameframework",
   "version": "1.2.5",
-  "description": "game framework for 2d html5 games with physics isomorphic",
+  "description": "[unmaintained in favor of gameframework-lite]",
   "main": "es2015/index.js",
   "scripts": {
     "prep4esdoc": "./prep4esdoc.sh index.js && ./prep4esdoc.sh view.js && ./prep4esdoc.sh physics.js",
