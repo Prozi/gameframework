@@ -10,6 +10,10 @@
 
 * Then I branched this off (lite branch) which ended up cutting out physics and is maintained and complete separate package now. Link above. Or by npm: `npm install gameframework-lite`.
 
+-----
+
+# Old Readme:
+
 ### documentation
 
 [https://prozi.github.io/gameframework/](https://prozi.github.io/gameframework/)
