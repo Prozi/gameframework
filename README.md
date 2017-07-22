@@ -1,8 +1,12 @@
-## gameframework
+## [unmaintained] gameframework
 
-This is still under development.
+* This *was* under development, but then came the tests. READ ON:
 
-I use it with success tho, feel free to open any issues/pull requests.
+* Then I experimented with it, found that BOX2D implementation might have some leaks (I'm not blaming! And I'm not sure either)
+
+* Then I branched this off (lite branch) which ended up cutting out physics and is maintained and complete separate package now:
+
+### [https://github.com/Prozi/gameframework-lite/](https://github.com/Prozi/gameframework-lite/)
 
 ## examples (non-MIT)
 
