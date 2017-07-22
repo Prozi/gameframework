@@ -1,20 +1,14 @@
-## [unmaintained] gameframework
+# Moved:
+
+### [https://github.com/Prozi/gameframework-lite/](https://github.com/Prozi/gameframework-lite/)
+
+## this repository is an [unmaintained] old copy of gameframework
 
 * This *was* under development, but then came the tests. READ ON:
 
 * Then I experimented with it, found that BOX2D implementation might have some leaks (I'm not blaming! And I'm not sure either)
 
-* Then I branched this off (lite branch) which ended up cutting out physics and is maintained and complete separate package now:
-
-### [https://github.com/Prozi/gameframework-lite/](https://github.com/Prozi/gameframework-lite/)
-
-## examples (non-MIT)
-
-Few games made on it:
-
-* [http://www.mini.ninja/vikings/](http://www.mini.ninja/vikings/)
-
-* [http://www.mini.ninja/ctf/](http://www.mini.ninja/ctf/)
+* Then I branched this off (lite branch) which ended up cutting out physics and is maintained and complete separate package now. Link above. Or by npm: `npm install gameframework-lite`.
 
 ### documentation
 
